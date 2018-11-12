@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/lewispeckover/consulator/command"
+	"github.com/inhuman/consulator/command"
 
 	"github.com/mitchellh/cli"
 )
@@ -27,7 +27,7 @@ func init() {
 		},
 		"sync": func() (cli.Command, error) {
 			return &command.ImportCommand{
-				Ui: ui,
+				Ui:    ui,
 				Purge: true,
 			}, nil
 		},
