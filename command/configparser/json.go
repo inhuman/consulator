@@ -3,10 +3,9 @@ package configparser
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/inhuman/jason"
 	"io"
 	"strings"
-
-	"github.com/antonholmquist/jason"
 )
 
 func parseJson(fp io.Reader, prefix []string, glue string) error {
