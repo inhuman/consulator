@@ -12,11 +12,13 @@ var absPath string
 var data map[string][]byte
 var forceType = "auto"
 var glue string
+var useArrayAsObject bool
 
-func Parse(path string, dataDest map[string][]byte, arrayGlue string) error {
+func Parse(path string, dataDest map[string][]byte, arrayGlue string, arrayAsObject bool) error {
 	absPath, _ = filepath.Abs(path)
 	data = dataDest
 	glue = arrayGlue
+	useArrayAsObject = arrayAsObject
 	_, err := os.Stat(absPath)
 	if err != nil {
 		return err
@@ -50,19 +52,19 @@ func Parse(path string, dataDest map[string][]byte, arrayGlue string) error {
 	return err
 }
 
-func ParseAsJSON(path string, dataDest map[string][]byte, arrayGlue string) error {
+func ParseAsJSON(path string, dataDest map[string][]byte, arrayGlue string, arrayAsObject bool) error {
 	forceType = "json"
-	return Parse(path, dataDest, arrayGlue)
+	return Parse(path, dataDest, arrayGlue, arrayAsObject)
 }
 
-func ParseAsYAML(path string, dataDest map[string][]byte, arrayGlue string) error {
+func ParseAsYAML(path string, dataDest map[string][]byte, arrayGlue string, arrayAsObject bool) error {
 	forceType = "yaml"
-	return Parse(path, dataDest, arrayGlue)
+	return Parse(path, dataDest, arrayGlue, arrayAsObject)
 }
 
-func ParseAsTAR(path string, dataDest map[string][]byte, arrayGlue string) error {
+func ParseAsTAR(path string, dataDest map[string][]byte, arrayGlue string, arrayAsObject bool) error {
 	forceType = "tar"
-	return Parse(path, dataDest, arrayGlue)
+	return Parse(path, dataDest, arrayGlue, arrayAsObject)
 }
 
 func walk(path string, fstat os.FileInfo, err error) error {

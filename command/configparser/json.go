@@ -3,9 +3,10 @@ package configparser
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/inhuman/jason"
 	"io"
 	"strings"
+
+	"github.com/inhuman/jason"
 )
 
 func parseJson(fp io.Reader, prefix []string, glue string) error {
@@ -30,12 +31,21 @@ func jsonWalk(prefix []string, obj *jason.Object) error {
 			data[key] = []byte(fmt.Sprintf("%v", v.Interface()))
 		case []interface{}:
 			// json array
-			o, _ := v.Array()
-			val, err := jsonArrayChoose(o)
-			if err != nil {
-				return err
+			if useArrayAsObject {
+				array, _ := v.ObjectArray()
+				for _, el := range array {
+					if err := jsonWalk(append(prefix, k), el); err != nil {
+						return err
+					}
+				}
+			} else {
+				o, _ := v.Array()
+				val, err := jsonArrayChoose(o)
+				if err != nil {
+					return err
+				}
+				data[key] = []byte(strings.Join(val, glue))
 			}
-			data[key] = []byte(strings.Join(val, glue))
 		case bool:
 			data[key] = []byte(fmt.Sprintf("%v", v.Interface()))
 		case nil:

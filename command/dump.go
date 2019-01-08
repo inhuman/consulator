@@ -14,17 +14,18 @@ import (
 )
 
 type DumpCommand struct {
-	Ui          cli.Ui
-	name        string
-	args        string
-	synopsis    string
-	flags       *flag.FlagSet
-	parseAsYAML *bool
-	parseAsJSON *bool
-	parseAsTAR  *bool
-	arrayGlue   *string
-	keyPrefix   *string
-	initialised bool
+	Ui            cli.Ui
+	name          string
+	args          string
+	synopsis      string
+	flags         *flag.FlagSet
+	parseAsYAML   *bool
+	parseAsJSON   *bool
+	parseAsTAR    *bool
+	arrayGlue     *string
+	arrayAsObject *bool
+	keyPrefix     *string
+	initialised   bool
 }
 
 func (c *DumpCommand) init() {
@@ -39,6 +40,7 @@ func (c *DumpCommand) init() {
 	c.parseAsJSON = c.flags.Bool("json", false, "Parse stdin as JSON")
 	c.parseAsTAR = c.flags.Bool("tar", false, "Parse stdin as a tarball")
 	c.arrayGlue = c.flags.String("glue", "\n", "Glue to use for joining array values")
+	c.arrayAsObject = c.flags.Bool("array_as_object", false, "Parce array values as object array")
 	c.keyPrefix = c.flags.String("prefix", "", "Key prefix to use for output")
 	c.flags.Usage = func() { c.Ui.Output(c.Help()) }
 	c.initialised = true
@@ -62,17 +64,17 @@ func (c *DumpCommand) Run(args []string) int {
 	if c.flags.NArg() == 0 {
 		switch {
 		case *c.parseAsYAML:
-			if err := configparser.ParseAsYAML("/dev/stdin", data, *c.arrayGlue); err != nil {
+			if err := configparser.ParseAsYAML("/dev/stdin", data, *c.arrayGlue, *c.arrayAsObject); err != nil {
 				c.Ui.Error(fmt.Sprintf("Error: %s", err))
 				return 1
 			}
 		case *c.parseAsJSON:
-			if err := configparser.ParseAsJSON("/dev/stdin", data, *c.arrayGlue); err != nil {
+			if err := configparser.ParseAsJSON("/dev/stdin", data, *c.arrayGlue, *c.arrayAsObject); err != nil {
 				c.Ui.Error(fmt.Sprintf("Error: %s", err))
 				return 1
 			}
 		case *c.parseAsTAR:
-			if err := configparser.ParseAsTAR("/dev/stdin", data, *c.arrayGlue); err != nil {
+			if err := configparser.ParseAsTAR("/dev/stdin", data, *c.arrayGlue, *c.arrayAsObject); err != nil {
 				c.Ui.Error(fmt.Sprintf("Error: %s", err))
 				return 1
 			}
@@ -83,7 +85,7 @@ func (c *DumpCommand) Run(args []string) int {
 		}
 	} else {
 		for _, p := range c.flags.Args() {
-			if err := configparser.Parse(p, data, *c.arrayGlue); err != nil {
+			if err := configparser.Parse(p, data, *c.arrayGlue, *c.arrayAsObject); err != nil {
 				c.Ui.Error(fmt.Sprintf("Error: %s", err))
 				return 1
 			}
